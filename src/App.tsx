@@ -1,22 +1,26 @@
-import { useState, useEffect } from 'react';
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Navbar } from './components/Navbar';
-import { SearchBar } from './components/SearchBar';
-import { CategoryFilter } from './components/CategoryFilter';
-import { ProductGrid } from './components/ProductGrid';
-import { LoadingSpinner } from './components/LoadingSpinner';
-import { ErrorState } from './components/ErrorState';
-import { SortDropdown } from './components/SortDropdown';
-import { ProductQuickView } from './components/ProductQuickView';
-import { Product } from './types/product';
+import { useState, useEffect } from "react";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Navbar } from "./components/Navbar";
+import { SearchBar } from "./components/SearchBar";
+import { CategoryFilter } from "./components/CategoryFilter";
+import { ProductGrid } from "./components/ProductGrid";
+import { LoadingSpinner } from "./components/LoadingSpinner";
+import { ErrorState } from "./components/ErrorState";
+import { SortDropdown } from "./components/SortDropdown";
+import { ProductQuickView } from "./components/ProductQuickView";
+import { Product } from "./types/product";
 
 const sortOptions = [
-  { label: 'Latest', value: 'latest' },
-  { label: 'Price: Low to High', value: 'price-asc' },
-  { label: 'Price: High to Low', value: 'price-desc' },
-  { label: 'Rating: High to Low', value: 'rating-desc' },
+  { label: "Latest", value: "latest" },
+  { label: "Price: Low to High", value: "price-asc" },
+  { label: "Price: High to Low", value: "price-desc" },
+  { label: "Rating: High to Low", value: "rating-desc" },
 ];
 
 const ITEMS_PER_PAGE = 12;
@@ -31,20 +35,24 @@ const queryClient = new QueryClient({
 });
 
 function ProductPage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [sortBy, setSortBy] = useState('latest');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [sortBy, setSortBy] = useState("latest");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
   // Fetch products
-  const { data: productsData, isLoading, error } = useQuery<{ products: Product[] }>({
-    queryKey: ['products'],
+  const {
+    data: productsData,
+    isLoading,
+    error,
+  } = useQuery<{ products: Product[] }>({
+    queryKey: ["products"],
     queryFn: async () => {
-      const response = await fetch('https://dummyjson.com/products?limit=100');
+      const response = await fetch("https://dummyjson.com/products?limit=100");
       if (!response.ok) {
-        throw new Error('Failed to fetch products');
+        throw new Error("Failed to fetch products");
       }
       return response.json();
     },
@@ -59,18 +67,21 @@ function ProductPage() {
     try {
       // Apply category filter
       if (selectedCategory) {
-        filtered = filtered.filter(product => product.category === selectedCategory);
+        filtered = filtered.filter(
+          (product) => product.category === selectedCategory
+        );
       }
 
       // Apply search filter if search query exists
       if (searchQuery.trim()) {
-        const searchTerms = searchQuery.toLowerCase().trim().split(' ');
-        filtered = filtered.filter(product => {
-          return searchTerms.some(term => 
-            product.title.toLowerCase().includes(term) ||
-            product.category.toLowerCase().includes(term) ||
-            product.brand.toLowerCase().includes(term) ||
-            product.description.toLowerCase().includes(term)
+        const searchTerms = searchQuery.toLowerCase().trim().split(" ");
+        filtered = filtered.filter((product) => {
+          return searchTerms.some(
+            (term) =>
+              product.title.toLowerCase().includes(term) ||
+              product.category.toLowerCase().includes(term) ||
+              product.brand?.toLowerCase().includes(term) ||
+              product.description.toLowerCase().includes(term)
           );
         });
       }
@@ -78,11 +89,11 @@ function ProductPage() {
       // Apply sorting
       filtered.sort((a, b) => {
         switch (sortBy) {
-          case 'price-asc':
+          case "price-asc":
             return a.price - b.price;
-          case 'price-desc':
+          case "price-desc":
             return b.price - a.price;
-          case 'rating-desc':
+          case "rating-desc":
             return b.rating - a.rating;
           default:
             return b.id - a.id;
@@ -91,7 +102,7 @@ function ProductPage() {
 
       return filtered;
     } catch (error) {
-      console.error('Error processing products:', error);
+      console.error("Error processing products:", error);
       return [];
     }
   };
@@ -111,7 +122,7 @@ function ProductPage() {
 
   // Get unique categories
   const categories = Array.from(
-    new Set(productsData?.products.map(product => product.category) || [])
+    new Set(productsData?.products.map((product) => product.category) || [])
   ).sort();
 
   // Event Handlers
@@ -120,12 +131,12 @@ function ProductPage() {
       setSearchQuery(value);
       setCurrentPage(1);
     } catch (error) {
-      console.error('Error in search:', error);
+      console.error("Error in search:", error);
     }
   };
-  
+
   const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category === 'all' ? '' : category);
+    setSelectedCategory(category === "all" ? "" : category);
     setCurrentPage(1);
   };
 
@@ -136,7 +147,7 @@ function ProductPage() {
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleProductClick = (product: Product) => {
@@ -145,9 +156,9 @@ function ProductPage() {
   };
 
   const handleClearFilters = () => {
-    setSearchQuery('');
-    setSelectedCategory('');
-    setSortBy('latest');
+    setSearchQuery("");
+    setSelectedCategory("");
+    setSortBy("latest");
     setCurrentPage(1);
   };
 
@@ -158,11 +169,15 @@ function ProductPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      
+
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">All Products</h1>
-          <p className="text-gray-600">Discover our amazing collection of products</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            All Products
+          </h1>
+          <p className="text-gray-600">
+            Discover our amazing collection of products
+          </p>
         </div>
 
         {/* Search and Filters */}
@@ -206,7 +221,7 @@ function ProductPage() {
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
                       Search: {searchQuery}
                       <button
-                        onClick={() => setSearchQuery('')}
+                        onClick={() => setSearchQuery("")}
                         className="ml-2 hover:text-purple-900"
                       >
                         ×
@@ -217,7 +232,7 @@ function ProductPage() {
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
                       Category: {selectedCategory}
                       <button
-                        onClick={() => setSelectedCategory('')}
+                        onClick={() => setSelectedCategory("")}
                         className="ml-2 hover:text-purple-900"
                       >
                         ×
@@ -245,7 +260,9 @@ function ProductPage() {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <p className="text-gray-500">No products found matching your criteria</p>
+                  <p className="text-gray-500">
+                    No products found matching your criteria
+                  </p>
                   <button
                     onClick={handleClearFilters}
                     className="mt-4 text-purple-600 hover:text-purple-700"
@@ -281,8 +298,8 @@ function ProductPage() {
                             onClick={() => handlePageChange(page)}
                             className={`min-w-[40px] h-10 rounded-lg border ${
                               currentPage === page
-                                ? 'bg-purple-600 text-white border-purple-600'
-                                : 'border-gray-300 hover:bg-gray-50'
+                                ? "bg-purple-600 text-white border-purple-600"
+                                : "border-gray-300 hover:bg-gray-50"
                             }`}
                           >
                             {page}
@@ -292,9 +309,14 @@ function ProductPage() {
                       // Show ellipsis
                       if (
                         (page === 2 && currentPage > 3) ||
-                        (page === totalPages - 1 && currentPage < totalPages - 2)
+                        (page === totalPages - 1 &&
+                          currentPage < totalPages - 2)
                       ) {
-                        return <span key={page} className="px-2">...</span>;
+                        return (
+                          <span key={page} className="px-2">
+                            ...
+                          </span>
+                        );
                       }
                       return null;
                     })}
