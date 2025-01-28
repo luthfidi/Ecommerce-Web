@@ -48,4 +48,4 @@ export default tseslint.config({
   },
 })
 ```
-# Ecommerce-Web
+# Ecommerce Web
